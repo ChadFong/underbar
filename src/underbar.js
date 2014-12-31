@@ -90,9 +90,6 @@
 
   // Return all elements of an array that don't pass a truth test.
   _.reject = function(collection, test) {
-
-    return _.filter(collection, function(num) {!test(num) } )
-
     // TIP: see if you can re-use _.filter() here, without simply
     // copying code in and modifying it
   };
@@ -111,6 +108,11 @@
 
   // Return the results of applying an iterator to each element.
   _.map = function(collection, iterator) {
+    var res = [];
+    _.each(collection, function(item){
+      res.push(iterator(item));
+    })
+    return res;
     // map() is a useful primitive iteration function that works a lot
     // like each(), but in addition to running the operation on all
     // the members, it also maintains an array of results.
