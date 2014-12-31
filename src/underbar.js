@@ -90,6 +90,12 @@
 
   // Return all elements of an array that don't pass a truth test.
   _.reject = function(collection, test) {
+    var not = function(someTest){
+      return function(){
+        return !someTest.apply(this, arguments);
+      }
+    }
+    return _.filter(collection, not(test));
     // TIP: see if you can re-use _.filter() here, without simply
     // copying code in and modifying it
   };
@@ -183,7 +189,12 @@
 
   // Determine whether all of the elements match a truth test.
   _.every = function(collection, iterator) {
-    // TIP: Try re-using reduce() here.
+    _.reduce(collection, function(current, next) {
+      if(!current){
+        return false;
+      }
+      return iterator(current) === iterator(next);
+    }, true)
   };
 
   // Determine whether any of the elements pass a truth test. If no iterator is
