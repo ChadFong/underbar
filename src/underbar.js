@@ -189,12 +189,15 @@
 
   // Determine whether all of the elements match a truth test.
   _.every = function(collection, iterator) {
-    _.reduce(collection, function(current, next) {
-      if(!current){
-        return false;
+    if (iterator === undefined){
+      iterator = _.identity;
+    }
+    return _.reduce(collection, function(current, next){
+      if (current == false) {
+        return false ;
       }
-      return iterator(current) === iterator(next);
-    }, true)
+      return Boolean(iterator(next));
+    }, true);
   };
 
   // Determine whether any of the elements pass a truth test. If no iterator is
