@@ -213,7 +213,6 @@
     var tracker = function(iter) {
       return function() {
         // Wrapper so we can pass tracker in without executing the wrong function.
-
         if (mem === false) {
           mem = Boolean(iter.apply(this, arguments));
           return true;
@@ -264,6 +263,14 @@
   // Like extend, but doesn't ever overwrite a key that already
   // exists in obj
   _.defaults = function(obj) {
+    for (var i=1; i<arguments.length ; i++) {
+      for (var key in arguments[i]) {
+        if(!(key in obj)){
+          obj[key] = arguments[i][key];
+        }
+      }
+     }
+     return obj;
   };
 
 
