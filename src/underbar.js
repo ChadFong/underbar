@@ -193,7 +193,7 @@
       iterator = _.identity;
     }
     return _.reduce(collection, function(current, next){
-      if (current == false) {
+      if (current === false) {
         return false ;
       }
       return Boolean(iterator(next));
@@ -203,6 +203,31 @@
   // Determine whether any of the elements pass a truth test. If no iterator is
   // provided, provide a default one
   _.some = function(collection, iterator) {
+
+    if (iterator === undefined) {
+      iterator = _.identity;
+    }
+
+    var mem = false;
+
+    var tracker = function(iter) {
+      return function() {
+        // Wrapper so we can pass tracker in without executing the wrong function.
+
+        if (mem === false) {
+          mem = Boolean(iter.apply(this, arguments));
+          return true;
+          // We return true here because we want to execute EVERY on each possible member
+          // of collection.  If this did not return true EVERY could start failing prior to
+          // reaching a true value.
+        }
+        return mem;
+      }
+    }
+
+    _.every(collection, tracker(iterator));
+
+    return mem;
     // TIP: There's a very clever way to re-use every() here.
   };
 
@@ -226,6 +251,13 @@
   //     bla: "even more stuff"
   //   }); // obj1 now contains key1, key2, key3 and bla
   _.extend = function(obj) {
+    var objectsToAdd = arguments.slice(1);
+     for (var i=0; i<objectsToAdd.length ; i++) {
+      for (var key in objectsToAdd[i]) {
+        obj[key] = objectsToAdd[i][key];
+      }
+     }
+     return obj;
   };
 
   // Like extend, but doesn't ever overwrite a key that already
