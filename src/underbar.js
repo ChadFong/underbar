@@ -229,6 +229,8 @@
 
     return mem;
     // TIP: There's a very clever way to re-use every() here.
+    // I suppose this is clever (and uses understanding of SCOPES, which is this sections 'thing', but
+    // it is not eloquent. It's really more convoluted.)
   };
 
 
@@ -251,10 +253,9 @@
   //     bla: "even more stuff"
   //   }); // obj1 now contains key1, key2, key3 and bla
   _.extend = function(obj) {
-    var objectsToAdd = arguments.slice(1);
-     for (var i=0; i<objectsToAdd.length ; i++) {
-      for (var key in objectsToAdd[i]) {
-        obj[key] = objectsToAdd[i][key];
+     for (var i=1; i<arguments.length ; i++) {
+      for (var key in arguments[i]) {
+        obj[key] = arguments[i][key];
       }
      }
      return obj;
