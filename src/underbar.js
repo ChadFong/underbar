@@ -39,7 +39,7 @@
   // last element.
   _.last = function(array, n) {
     var num = n > array.length ? 0 : array.length - n;
-    return n === undefined ? array[array.length-1] : array.slice(num, array.length)
+    return n === undefined ? array[array.length-1] : array.slice(num, array.length);
   };
 
   // Call iterator(value, key, collection) for each element of collection.
@@ -84,7 +84,7 @@
       if(test(item) === true){
         result.push(item);
       }
-    })
+    });
     return result;
   };
 
@@ -93,8 +93,8 @@
     var not = function(someTest){
       return function(){
         return !someTest.apply(this, arguments);
-      }
-    }
+      };
+    };
     return _.filter(collection, not(test));
     // TIP: see if you can re-use _.filter() here, without simply
     // copying code in and modifying it
@@ -107,7 +107,7 @@
       if(_.indexOf(res, item) == -1){
         res.push(item);
       }
-    })
+    });
     return res;
   };
 
@@ -117,7 +117,7 @@
     var res = [];
     _.each(collection, function(item){
       res.push(iterator(item));
-    })
+    });
     return res;
     // map() is a useful primitive iteration function that works a lot
     // like each(), but in addition to running the operation on all
@@ -208,28 +208,13 @@
       iterator = _.identity;
     }
 
-    var mem = false;
+    var not = function(iterator){
+      return function(){
+        return !iterator.apply(this, arguments);
+      };
+    };
 
-    var tracker = function(iter) {
-      return function() {
-        // Wrapper so we can pass tracker in without executing the wrong function.
-        if (mem === false) {
-          mem = Boolean(iter.apply(this, arguments));
-          return true;
-          // We return true here because we want to execute EVERY on each possible member
-          // of collection.  If this did not return true EVERY could start failing prior to
-          // reaching a true value.
-        }
-        return mem;
-      }
-    }
-
-    _.every(collection, tracker(iterator));
-
-    return mem;
-    // TIP: There's a very clever way to re-use every() here.
-    // I suppose this is clever (and uses understanding of SCOPES, which is this sections 'thing', but
-    // it is not eloquent. It's really more convoluted.)
+    return !_.every(collection, not(iterator));
   };
 
 
@@ -326,7 +311,7 @@
       else {
         return calls[args];
       }
-    }
+    };
   };
 
   // Delays a function for the given number of milliseconds, and then calls
@@ -389,6 +374,19 @@
   // Example:
   // _.zip(['a','b','c','d'], [1,2,3]) returns [['a',1], ['b',2], ['c',3], ['d',undefined]]
   _.zip = function() {
+    var args = [].slice.apply(arguments);
+    var longestFirst = [].slice.apply(arguments).sort(function(a, b) {return a.length + b.length});
+    var result = [];
+    for(var i=0 ; i<longestFirst[0].length ; i++) {
+      result.push([]);
+    }
+
+    for(var j=0 ; j<args.length ; j++){
+      for(var k=0 ; k<args[j].length ; k++){
+        result[k].push(args[j][k]);
+      }
+    }
+    return result;
   };
 
   // Takes a multidimensional array and converts it to a one-dimensional array.
@@ -396,7 +394,42 @@
   //
   // Hint: Use Array.isArray to check if something is an array
   _.flatten = function(nestedArray, result) {
-  };
+
+    var nestedChecker = function(potentiallyNestedArray) {
+      return _.some(potentiallyNestedArray, Array.isArray);
+    };
+    
+    if(result === undefined) {
+      result = [];
+    }
+    
+    var helper = function(current, rest) {
+      if(current.length === 0) {
+        return result;
+      }
+      else if(Array.isArray(current[0])) {
+        if(current.slice(1).length>0){
+        rest.unshift(current.slice(1));
+      }
+        helper(current[0], rest);
+      }
+      else if (!nestedChecker(current)) {
+        for(var i=0 ; i<current.length ; i++) {
+          result.push(current[i]);
+        }
+        helper(rest, []);
+      }
+      else {
+        result.push(current[0]);
+        if(current.slice(1).length>0) {
+        rest.unshift(current.slice(1));
+      }
+        helper(rest, []);
+      }
+    };
+    helper(nestedArray, []);
+    return result;
+};
 
   // Takes an arbitrary number of arrays and produces an array that contains
   // every item shared between all the passed-in arrays.
